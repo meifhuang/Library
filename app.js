@@ -13,7 +13,6 @@ class Book {
 
 function addBooktoLibrary(book) {
     myLibrary.push(book);
-    displayBooks();
 }
 
 //insert book to start
@@ -22,7 +21,17 @@ const book1 = new Book('Cracking the Coding Interview', 'Gayle Lakmann McDowell'
 const book2 = new Book('The Giver', 'Lois Lowry', '240', true);
 addBooktoLibrary(book1);
 addBooktoLibrary(book2);
+setUpStorage();
+myLibrary = JSON.parse(localStorage.getItem('library') || []);
+displayBooks();
 
+// localStorage.clear();
+
+function setUpStorage() {
+    if (!localStorage.getItem('library')) {
+        localStorage.setItem('library', JSON.stringify(myLibrary))
+    }
+}
 
 //retrieve form values + create book + add book to library
 let bookform = document.querySelector('form');
@@ -34,6 +43,10 @@ bookform.addEventListener('submit', (e) => {
     let read = e.currentTarget.read.checked;
     let createBook = new Book(title, author, pages, read);
     addBooktoLibrary(createBook);
+    // myLibrary =
+    let oldInfo = JSON.parse(localStorage.getItem('library') || [])
+    localStorage.setItem('library', JSON.stringify([...oldInfo, createBook]));
+    displayBooks();
     // localStorage.setItem('library', JSON.stringify(myLibrary));
 
     let titleInput = document.querySelector("#title");
@@ -112,6 +125,7 @@ function displayBooks() {
             btn.addEventListener('click', (e) => {
                 e.stopImmediatePropagation();
                 myLibrary.splice(`${e.target.getAttribute("index")} `, 1);
+                localStorage.setItem('library', JSON.stringify(myLibrary));
                 displayBooks();
 
             })
@@ -124,55 +138,14 @@ function displayBooks() {
                 e.target.classList.toggle("on");
                 if (e.target.classList.contains("on")) {
                     e.target.textContent = "check";
+                    book.read = true;
                 }
-                // else {
-                //     // e.target.textContent = "close";
-                // }
+                else {
+                    book.read = false;
+                }
+                localStorage.setItem('library', JSON.stringify(myLibrary));
+
             })
         })
     })
-}
-
-//localstorage 
-function storageAvailable(type) {
-    let storage;
-    try {
-        storage = window[type];
-        const x = '__storage_test__';
-        storage.setItem(x, x);
-        storage.removeItem(x);
-        return true;
-    }
-    catch (e) {
-        return e instanceof DOMException && (
-            // everything except Firefox
-            e.code === 22 ||
-            // Firefox
-            e.code === 1014 ||
-            // test name field too, because code might not be present
-            // everything except Firefox
-            e.name === 'QuotaExceededError' ||
-            // Firefox
-            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
-            // acknowledge QuotaExceededError only if there's something already stored
-            (storage && storage.length !== 0);
-    }
-}
-function store() {
-    if (storageAvailable('localStorage')) {
-        if (!localStorage.getItem('library')) {
-            console.log(myLibrary);
-            console.log(JSON.stringify(myLibrary));
-            localStorage.setItem('library', JSON.stringify(myLibrary));
-
-        }
-        else {
-            localStorage.clear();
-            let lib = localStorage.getItem('library');
-            let books = JSON.parse(lib);
-            myLibrary = []
-            books.forEach((book) => myLibrary.push(book));
-            localStorage.setItem('library', JSON.stringify(myLibrary));
-        }
-    }
 }
