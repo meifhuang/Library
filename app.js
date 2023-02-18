@@ -16,8 +16,10 @@ function addBooktoLibrary(book) {
     displayBooks();
 }
 //insert book to start
-const meihuang = new Book('Library', 'Mei Huang', '1', true);
-addBooktoLibrary(meihuang);
+const book1 = new Book('Cracking the Coding Interview', 'Gayle Lakmann McDowell', '687', false);
+const book2 = new Book('The Giver', 'Lois Lowry', '240', true);
+addBooktoLibrary(book1);
+addBooktoLibrary(book2);
 
 //retrieve form values + create book + add book to library
 let bookform = document.querySelector('form');
@@ -68,11 +70,11 @@ function displayBooks() {
         removeCard.textContent = "delete";
 
 
-        if (titleCard.textContent.length > 25) {
+        if (titleCard.textContent.length > 30) {
             titleCard.classList.add('smaller');
         };
 
-        if (authorCard.textContent.length > 25) {
+        if (authorCard.textContent.length > 30) {
             authorCard.classList.add('smaller');
         };
 
@@ -90,7 +92,7 @@ function displayBooks() {
             readCard.textContent = 'check';
         }
         else {
-            readCard.textContent = 'close';
+            readCard.textContent = 'check';
         }
 
         //append each section to card
@@ -118,9 +120,9 @@ function displayBooks() {
                 if (e.target.classList.contains("on")) {
                     e.target.textContent = "check";
                 }
-                else {
-                    e.target.textContent = "close";
-                }
+                // else {
+                //     // e.target.textContent = "close";
+                // }
             })
         })
     })
