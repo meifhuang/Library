@@ -15,11 +15,14 @@ function addBooktoLibrary(book) {
     myLibrary.push(book);
     displayBooks();
 }
+
 //insert book to start
+
 const book1 = new Book('Cracking the Coding Interview', 'Gayle Lakmann McDowell', '687', false);
 const book2 = new Book('The Giver', 'Lois Lowry', '240', true);
 addBooktoLibrary(book1);
 addBooktoLibrary(book2);
+
 
 //retrieve form values + create book + add book to library
 let bookform = document.querySelector('form');
@@ -31,6 +34,7 @@ bookform.addEventListener('submit', (e) => {
     let read = e.currentTarget.read.checked;
     let createBook = new Book(title, author, pages, read);
     addBooktoLibrary(createBook);
+    // localStorage.setItem('library', JSON.stringify(myLibrary));
 
     let titleInput = document.querySelector("#title");
     let authorInput = document.querySelector("#author");
@@ -109,6 +113,7 @@ function displayBooks() {
                 e.stopImmediatePropagation();
                 myLibrary.splice(`${e.target.getAttribute("index")} `, 1);
                 displayBooks();
+
             })
         })
 
@@ -126,4 +131,48 @@ function displayBooks() {
             })
         })
     })
+}
+
+//localstorage 
+function storageAvailable(type) {
+    let storage;
+    try {
+        storage = window[type];
+        const x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch (e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            (storage && storage.length !== 0);
+    }
+}
+function store() {
+    if (storageAvailable('localStorage')) {
+        if (!localStorage.getItem('library')) {
+            console.log(myLibrary);
+            console.log(JSON.stringify(myLibrary));
+            localStorage.setItem('library', JSON.stringify(myLibrary));
+
+        }
+        else {
+            localStorage.clear();
+            let lib = localStorage.getItem('library');
+            let books = JSON.parse(lib);
+            myLibrary = []
+            books.forEach((book) => myLibrary.push(book));
+            localStorage.setItem('library', JSON.stringify(myLibrary));
+        }
+    }
 }
