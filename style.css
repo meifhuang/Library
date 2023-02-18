@@ -1,0 +1,145 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body { 
+    background-color: #e8e5e5; 
+    font-family: 'Poppins', sans-serif;
+}
+
+.wrapper {
+    display: grid;
+    grid-auto-flow: column; 
+    height: 100vh;
+}
+
+.sidebar {
+    background-color: white; 
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    align-items: start;
+}
+
+.sidebar > * {
+    margin: 15px;
+}
+
+#signup > * {
+    padding: 5px;
+}
+
+form {
+    display: grid;
+}
+
+input {
+    margin: 5px;
+}
+
+.main {
+    margin-left: 50px;
+    margin-right: 50px;
+   
+}
+
+.mainLabel {
+    display: grid; 
+    grid-auto-flow: column;
+    grid-template-columns: 300px 280px 160px 100px 50px;
+
+    color: white;
+    padding: 1em;
+    margin-top: 2em;
+    border: 1px solid black;
+    background-color: rgb(2, 53, 84);
+}
+
+.book {
+    height: 70px; 
+    border-bottom: 1px solid black;
+    border-bottom-style:dotted;
+    
+    display: grid; 
+    grid-auto-flow: column;
+    grid-template-columns: 305px 280px 170px 110px 50px;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+   
+}
+
+.book > * {
+    margin: 5px;
+    padding: 8px;
+    
+}
+
+.remove:hover,.onOff:hover{
+    cursor: pointer; 
+}
+
+.smaller {
+    font-size: 10px;
+}
+
+
+label {
+    color: black;
+    font-size: 15px;
+}
+
+.onOff  {
+    color: red; 
+}
+.on {
+    color: green;
+}
+
+.submit {
+    padding: 7px;
+    color: rgb(2, 53, 84);
+    border: 1.5px solid rgb(2, 53, 84);
+    font-weight: 530;
+    transition: .7s;
+}
+
+.submit:hover {
+    cursor: pointer;
+    background-color: rgb(2, 53, 84); 
+    color: white;
+}
+
+.submit:active {
+    transform: scale(.7);
+    
+}
+
+.credit { 
+    justify-self: end;
+    font-family: 'Poppins', sans-serif;
+    font-size: 8px;
+}
+
+.hoverTitle .readTip, .removeTip{
+    visibility: hidden;
+    position: absolute;
+    right: 4em;
+    top: .35em;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    color:rgb(2, 53, 84);
+    }
+
+.hoverTitle:hover .readTip, .hoverTitle:hover .removeTip{
+    visibility: visible;
+    cursor: pointer;
+}
+
+
+h1 {
+    font-family: 'Fredericka the Great', cursive;
+    font-size: 40px;
+}
