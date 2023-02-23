@@ -1,4 +1,5 @@
-
+import './style.css';
+ 
 /** arrray to hold books **/
 let myLibrary = [];
 
@@ -101,9 +102,9 @@ function displayBooks() {
         removeCard.classList.add('remove');
         readCard.classList.add('onOff');
         removeCard.classList.add('material-symbols-outlined');
-        let indexer = myLibrary.map(b => b.title).indexOf(`${book.title} `);
+        let indexer = myLibrary.map(b => b.title).indexOf(`${book.title}`);
         removeCard.setAttribute('index', indexer);
-
+    
         if (book.read === true) {
             readCard.classList.add('on');
             readCard.textContent = 'check';
