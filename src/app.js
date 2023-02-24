@@ -1,5 +1,9 @@
 import './style.css';
- 
+import firebaseConfig from '../firebase.config';
+import { initializeApp } from 'firebase/app';
+// import firebase from 'firebase/app';
+// import 'firebase/firestore';
+
 /** arrray to hold books **/
 let myLibrary = [];
 
@@ -104,7 +108,7 @@ function displayBooks() {
         removeCard.classList.add('material-symbols-outlined');
         let indexer = myLibrary.map(b => b.title).indexOf(`${book.title}`);
         removeCard.setAttribute('index', indexer);
-    
+
         if (book.read === true) {
             readCard.classList.add('on');
             readCard.textContent = 'check';
@@ -150,3 +154,9 @@ function displayBooks() {
         })
     })
 }
+
+
+//firebase
+
+
+const app = initializeApp(firebaseConfig)
