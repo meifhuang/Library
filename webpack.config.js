@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/app.js',
   // The location of the build folder described above
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'public'),
     filename: 'bundle.js'
   },
   plugins: [
@@ -25,5 +25,3 @@ module.exports = {
   // map the built code back to the original source format when debugging.
   devtool: 'eval-source-map',
 };
-
-

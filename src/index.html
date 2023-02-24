@@ -31,6 +31,7 @@
 
     <div class="wrapper">
         <div class="sidebar">
+
             <h1> <span class="material-symbols-outlined"> auto_stories </span> Library </h1>
             <form action="/action_page.php" id="signup">
                 <label for="title">Title</label>
@@ -45,32 +46,41 @@
                 </div>
                 <input class="submit" type="submit" value="+ Add book"> </input>
             </form>
+
             <div class="footer">
+
                 <p> &copy; <a href="https://github.com/meifhuang/Library"> MEI HUANG </a> 2023 </p>
             </div>
         </div>
         <div class="main">
+            <div class="google">
+                <button id="sign-in"> Sign In </button>
+                <div hidden id="user-pic"> </div>
+                <div hidden id="user-name"> </div>
+                <button hidden id="sign-out"> Sign out </button>
+            </div>
             <div class="mainLabel">
                 <h3>Title</h3>
                 <h3>Author</h3>
                 <h3>Pages</h3>
-
+                <!-- 
                 <h3 class="hoverTitle">Read
                     <span class="readTip"> Click &#10004; to toggle read/unread</span>
                 </h3>
 
                 <h3 class="hoverTitle">
                     Remove
-                    <span class="removeTip"> Click garbage can to delete </span>
+                    <span class="removeTip"> Click garbage can to delete </span> -->
                 </h3>
             </div>
             <div class="bookshelf">
 
             </div>
+
         </div>
     </div>
 
-    <script src="/dist/bundle.js"> </script>
+    <script src="/public/bundle.js"> </script>
 </body>
 
 </html>

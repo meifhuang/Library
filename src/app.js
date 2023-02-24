@@ -1,6 +1,9 @@
 import './style.css';
 import firebaseConfig from '../firebase.config';
 import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getFirestore, collection, addDoc, query, onSnapshot, setDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+
 // import firebase from 'firebase/app';
 // import 'firebase/firestore';
 
@@ -25,6 +28,7 @@ function addBooktoLibrary(book) {
 const book1 = new Book('Cracking the Coding Interview', 'Gayle Lakmann McDowell', '687', false);
 const book2 = new Book('The Giver', 'Lois Lowry', '240', true);
 addBooktoLibrary(book1);
+saveBook(book1);
 addBooktoLibrary(book2);
 setUpStorage();
 myLibrary = JSON.parse(localStorage.getItem('library') || []);
@@ -158,5 +162,78 @@ function displayBooks() {
 
 //firebase
 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-const app = initializeApp(firebaseConfig)
+//sign in 
+async function signIn() {
+    var provider = new GoogleAuthProvider();
+    await signInWithPopup(getAuth(), provider);
+}
+
+function signOutUser() {
+    signOut(getAuth());
+}
+
+function initFirebaseAuth() {
+    onAuthStateChanged(getAuth(), authStateObserver);
+}
+
+function getProfilePicUrl() {
+    return getAuth().currentUser.photoURL || '/images/profile_placeholder.png'
+}
+
+function getUserName() {
+    return getAuth().currentUser.displayName;
+}
+
+function authStateObserver(user) {
+    if (user) {
+        let profilePicUrl = getProfilePicUrl();
+        let userName = getUserName();
+        userPic.style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
+        userNameDiv.textContent = userName;
+        userPic.removeAttribute('hidden');
+        userNameDiv.removeAttribute('hidden');
+        signOutButton.removeAttribute('hidden');
+        signInButton.setAttribute('hidden', true);
+    }
+    else {
+        userNameDiv.setAttribute('hidden', 'true');
+        userPic.setAttribute('hidden', 'true');
+        signOutButton.setAttribute('hidden', 'true');
+        signInButton.removeAttribute('hidden');
+    }
+}
+
+function addSizeToGoogleProfilePic(url) {
+    if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
+        return url + '?sz=150';
+    }
+    return url;
+}
+
+async function saveBook(book) {
+    try {
+        await addDoc(collection(getFirestore(), 'books'), {
+            title: book.title,
+            author: book.author,
+            pages: book.pages,
+            read: book.read
+        })
+    }
+    catch (err) {
+        console.error(err)
+    }
+}
+
+let userPic = document.getElementById('user-pic');
+let userNameDiv = document.getElementById('user-name');
+let signInButton = document.getElementById('sign-in');
+let signOutButton = document.getElementById('sign-out');
+
+
+signOutButton.addEventListener('click', signOutUser);
+signInButton.addEventListener('click', signIn);
+
+initFirebaseAuth(); 
