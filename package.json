@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "build": "webpack --mode=development",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1", 
+    "watch": "watch 'npm run build' ./public"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,8 @@
   },
   "homepage": "https://github.com/meifhuang/Library#readme",
   "dependencies": {
-    "firebase": "^9.17.1"
+    "firebase": "^9.17.1",
+    "watch": "^1.0.2"
   },
   "devDependencies": {
     "css-loader": "^6.7.3",

@@ -2,13 +2,14 @@ import './style.css';
 import firebaseConfig from '../firebase.config';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { getFirestore, collection, addDoc, query, onSnapshot, setDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, where, onSnapshot, setDoc, updateDoc, doc, serverTimestamp, getDocs, orderBy, deleteDoc, limit } from 'firebase/firestore';
 
 // import firebase from 'firebase/app';
 // import 'firebase/firestore';
 
 /** arrray to hold books **/
 let myLibrary = [];
+let userId;
 
 class Book {
     constructor(title, author, pages, read) {
@@ -16,6 +17,14 @@ class Book {
         this.author = author;
         this.pages = pages;
         this.read = read;
+    }
+    toJSON() {
+        return {
+            title: this.title,
+            author: this.author,
+            pages: this.pages,
+            read: this.read
+        }
     }
 }
 
@@ -25,14 +34,10 @@ function addBooktoLibrary(book) {
 
 //insert book to start
 
-const book1 = new Book('Cracking the Coding Interview', 'Gayle Lakmann McDowell', '687', false);
-const book2 = new Book('The Giver', 'Lois Lowry', '240', true);
-addBooktoLibrary(book1);
-saveBook(book1);
-addBooktoLibrary(book2);
-setUpStorage();
-myLibrary = JSON.parse(localStorage.getItem('library') || []);
-displayBooks();
+
+// addBooktoLibrary(book2);
+// setUpStorage();
+
 
 // localStorage.clear();
 
@@ -51,11 +56,10 @@ bookform.addEventListener('submit', (e) => {
     let pages = e.currentTarget.pages.value;
     let read = e.currentTarget.read.checked;
     let createBook = new Book(title, author, pages, read);
-    addBooktoLibrary(createBook);
+    // addBooktoLibrary(createBook);
+    saveBook(createBook); 
     // myLibrary =
-    let oldInfo = JSON.parse(localStorage.getItem('library') || [])
-    localStorage.setItem('library', JSON.stringify([...oldInfo, createBook]));
-    displayBooks();
+    
     // localStorage.setItem('library', JSON.stringify(myLibrary));
 
     let titleInput = document.querySelector("#title");
@@ -133,28 +137,24 @@ function displayBooks() {
         removeButtons.forEach((btn) => {
             btn.addEventListener('click', (e) => {
                 e.stopImmediatePropagation();
-                myLibrary.splice(`${e.target.getAttribute("index")} `, 1);
-                localStorage.setItem('library', JSON.stringify(myLibrary));
-                displayBooks();
-
+                deletebook(book);
             })
         })
 
         let toggleRead = document.querySelectorAll(".onOff");
-        toggleRead.forEach((read) => {
+        toggleRead.forEach( async (read) => {
             read.addEventListener('click', (e) => {
                 e.stopImmediatePropagation();
                 e.target.classList.toggle("on");
                 if (e.target.classList.contains("on")) {
-                    e.target.textContent = "check";
                     book.read = true;
                 }
                 else {
                     book.read = false;
                 }
-                localStorage.setItem('library', JSON.stringify(myLibrary));
-
+                updateBook(book); 
             })
+
         })
     })
 }
@@ -163,9 +163,13 @@ function displayBooks() {
 //firebase
 
 const app = initializeApp(firebaseConfig);
+
+initFirebaseAuth(); 
 const db = getFirestore(app);
 
+
 //sign in 
+
 async function signIn() {
     var provider = new GoogleAuthProvider();
     await signInWithPopup(getAuth(), provider);
@@ -173,6 +177,7 @@ async function signIn() {
 
 function signOutUser() {
     signOut(getAuth());
+    userId = null; 
 }
 
 function initFirebaseAuth() {
@@ -197,12 +202,15 @@ function authStateObserver(user) {
         userNameDiv.removeAttribute('hidden');
         signOutButton.removeAttribute('hidden');
         signInButton.setAttribute('hidden', true);
+        local.setAttribute('hidden', true); 
+        loadBooks();
     }
     else {
         userNameDiv.setAttribute('hidden', 'true');
         userPic.setAttribute('hidden', 'true');
         signOutButton.setAttribute('hidden', 'true');
         signInButton.removeAttribute('hidden');
+        local.removeAttribute('hidden');
     }
 }
 
@@ -213,27 +221,113 @@ function addSizeToGoogleProfilePic(url) {
     return url;
 }
 
-async function saveBook(book) {
-    try {
-        await addDoc(collection(getFirestore(), 'books'), {
-            title: book.title,
-            author: book.author,
-            pages: book.pages,
-            read: book.read
-        })
+const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        loadBooks();
     }
-    catch (err) {
-        console.error(err)
+    else {
+        loadBooks(); 
+    }
+})
+
+async function saveBook(book) {
+    let user = getAuth().currentUser; 
+    if (user) {
+        const user = getAuth().currentUser;
+        const docRef = await addDoc(collection(db, `users/${user.uid}/books`),{...book.toJSON(), createdAt: serverTimestamp()}); 
+    }
+    else if (!user) {
+        let oldInfo = JSON.parse(localStorage.getItem('library') || [])
+        localStorage.setItem('library', JSON.stringify([...oldInfo, book])); 
+    }
+    loadBooks(); 
+}
+
+async function deletebook(book) {
+    let user = getAuth().currentUser; 
+    if (user) { 
+        const user = getAuth().currentUser;
+        const lib = collection(db, `users/${user.uid}/books`);
+        const queried = query(lib, where("title", "==", book.title), where("author", "==", book.author), where("pages", "==", book.pages))
+        const snap = await getDocs(queried); 
+        snap.forEach(doc => {
+            deleteDoc(doc.ref)
+        })
+       
+    }
+    else {
+       
+        let index;
+        let oldInfo = JSON.parse(localStorage.getItem('library') || [])
+
+        for (let i = 0; i < oldInfo.length; i++) {
+            if (oldInfo[i].title === book.title && oldInfo[i].author === book.author) {
+                index = i 
+            }
+        }
+        oldInfo.splice(index, 1);
+        localStorage.setItem('library', JSON.stringify(oldInfo));
+    }
+    loadBooks(); 
+}
+
+async function updateBook(book) {
+    let user = getAuth().currentUser; 
+    if (user) { 
+        const user = getAuth().currentUser;
+        const lib = collection(db, `users/${user.uid}/books`);
+        const queried = query(lib, where("title", "==", book.title), where("author", "==", book.author), where("pages", "==", book.pages))
+        const querySnapshot = await getDocs(queried);
+        const docRef = querySnapshot.docs[0].ref;
+        await updateDoc(docRef, { 
+        read: book.read
+        });
+        }
+    else {
+        let oldInfo = JSON.parse(localStorage.getItem('library') || [])
+        for (let i = 0; i < oldInfo.length; i++) {
+            if (oldInfo[i].title === book.title && oldInfo[i].author === book.author) {
+                oldInfo[i].read = book.read;
+            }
+        }
+        localStorage.setItem('library', JSON.stringify(oldInfo));
+    }
+    loadBooks();
+}
+
+
+async function loadBooks() {
+    let user = getAuth().currentUser; 
+    if (user) {
+        const querySnap = await getDocs(collection(db, `users/${user.uid}/books`), orderBy("createdAt",'desc'));
+        let tempLib = [];
+        let prevLib = myLibrary; 
+        querySnap.forEach((doc) => {
+            tempLib.push(doc.data());
+        })
+        myLibrary = tempLib
+        displayBooks(); 
+        myLibrary = prevLib; 
+    }
+    else {
+        let prevLib = myLibrary;
+        setUpStorage();
+        let tempLibrary = JSON.parse(localStorage.getItem('library') || []);
+        myLibrary = tempLibrary;
+        displayBooks(); 
+        myLibrary = prevLib; 
     }
 }
+
 
 let userPic = document.getElementById('user-pic');
 let userNameDiv = document.getElementById('user-name');
 let signInButton = document.getElementById('sign-in');
 let signOutButton = document.getElementById('sign-out');
-
+let local = document.getElementById('local');
 
 signOutButton.addEventListener('click', signOutUser);
 signInButton.addEventListener('click', signIn);
 
-initFirebaseAuth(); 
+loadBooks();

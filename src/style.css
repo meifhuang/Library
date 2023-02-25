@@ -137,36 +137,6 @@ label {
     font-size: 8px;
 }
 
-.hoverTitle .readTip,
-.removeTip {
-    visibility: hidden;
-    position: absolute;
-    right: 4em;
-    top: .35em;
-    font-family: 'Poppins', sans-serif;
-    font-size: 15px;
-    color: rgb(2, 53, 84);
-}
-
-.hoverTitle .readTip,
-.removeTip {
-    visibility: hidden;
-    position: absolute;
-    right: 4em;
-    top: .35em;
-    font-family: 'Poppins', sans-serif;
-    font-size: 15px;
-    color: rgb(2, 53, 84);
-}
-
-/* 
-.hoverTitle:hover .readTip,
-.hoverTitle:hover .removeTip {
-    visibility: visible;
-    cursor: pointer;
-}
- */
-
 h1 {
     font-family: 'Fredericka the Great', cursive;
     font-size: 40px;
@@ -177,7 +147,6 @@ h1 {
     position: fixed;
     width: 100%;
 }
-
 
 
 .footer a {
@@ -192,17 +161,40 @@ h1 {
     display: flex;
     justify-content: end;
     align-items: center;
-    height: 3em;
+    height: 2.5em;
+    margin: 1em; 
 }
 
+
+
 .google>* {
-    margin-right: 5px;
+    margin-right: 10px;
 }
 
 #user-pic {
     background-repeat: no-repeat;
-    width: 35px;
-    height: 35px;
-    background-size: 35px;
+    width: 30px;
+    height: 30px;
+    background-size: 30px;
     border-radius: 20px;
 }
+
+#local {
+    font-size: 1em; 
+}
+
+#sign-in, 
+#sign-out {
+    padding: 5px;
+    color: rgb(2, 53, 84);
+    border: 1.5px solid rgb(2, 53, 84);
+    font-weight: 530;
+    transition: .7s;
+}
+
+#sign-in:hover, 
+#sign-out:hover {
+cursor: pointer;
+background-color: rgb(2, 53, 84);
+color: white;
+} 
